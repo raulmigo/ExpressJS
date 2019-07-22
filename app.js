@@ -1,20 +1,34 @@
 const express = require('express');
+const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 
 const app = express();
+
+app.use(bodyParser.urlencoded({ extended: false}));
+app.use(cookieParser());
 
 app.set('view engine', 'pug');
 
 app.get('/', (req, res) => {
-    res.render('index');
+    const name = req.cookies.username;
+    if (name) {
+        res.render('index', { name });
+    } else {
+        res.redirect('/hello');
+    }
 })
 
 app.get('/hello', (req, res) => {
+    const name = req.cookies.username;
+    if(name) {
+        res.redirect('/index');
+    }
     res.render('hello');
-    // console.log("hello.pug called")
 })
 
 app.post('/hello', (req, res) => {
-    res.render('hello');
+    res.cookie('username',req.body.username);
+    res.redirect('/');
     // console.log("hello.pug called")
 })
 
